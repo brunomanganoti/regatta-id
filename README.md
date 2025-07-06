@@ -18,9 +18,9 @@ Trata-se de um sistema Web, focado em **eficiência, segurança, praticidade e c
 |----------------------------------|----------|
 | [Bruno Manganoti de Lara](mailto:ra129556@uem.br) | 129556 |
 | [Felipe Nascimento de Angelis](mailto:ra130131@uem.br)     | 130131   |
+| [Gabriel Prado](mailto:ra128272@uem.br) | 128968   |
 | [Gustavo Henrique Sargi Michelim](mailto:ra128968@uem.br)  | 128968   |
 | [Pedro Seiji Tabada](mailto:ra129554@uem.br)     | 129554   |
-| [Gabriel Prado](mailto:ra128272@uem.br) | 128968   |
 
 ---
 
