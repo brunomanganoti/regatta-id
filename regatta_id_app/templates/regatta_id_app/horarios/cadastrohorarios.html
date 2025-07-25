@@ -1,0 +1,266 @@
+{% load static %}
+{% load widget_tweaks %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RegattaID - {% if form.instance.pk %}Editar Horário{% else %}Cadastrar Horário{% endif %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --roxo-escuro: #4b2e83;
+            --roxo-medio: #6a3d9a;
+            --lilas: #b399d4;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: linear-gradient(to bottom, var(--roxo-escuro), var(--roxo-medio));
+            color: white;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: 250px;
+            padding-top: 20px;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+            padding: 12px 20px;
+            margin: 2px 10px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            transition: .3s;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 12px;
+            font-size: 1.1rem;
+            width: 20px;
+        }
+
+        .user-menu {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 20px 30px;
+            width: calc(100% - 250px);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            margin-top: 20px;
+        }
+
+        .form-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            width: 98%;
+            max-width: 800px;
+        }
+
+        .form-title {
+            color: var(--roxo-escuro);
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--lilas);
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--roxo-escuro);
+        }
+
+        .btn-voltar {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--roxo-escuro);
+            text-decoration: none;
+        }
+
+        .btn-voltar i {
+            margin-right: 5px;
+        }
+
+        .btn-submit {
+            background: var(--roxo-escuro);
+            color: white;
+            padding: 10px 30px;
+            font-weight: 500;
+            width: 100%;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="px-3 mb-4">
+                <h2 class="text-center"><i class="bi bi-shield-lock"></i> RegattaID</h2>
+            </div>
+
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#usersCollapse">
+                        <i class="bi bi-people-fill"></i> Usuários <i class="bi bi-chevron-down float-end"></i>
+                    </a>
+                    <div class="collapse" id="usersCollapse">
+                        <ul class="nav flex-column ps-4">
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'listar_estudantes' %}">Estudantes</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Colaboradores</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Voluntários</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">Visitantes</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'listar_turmas' %}">
+                        <i class="bi bi-journal-bookmark-fill"></i> Turmas
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'relatorio' %}">
+                        <i class="bi bi-file-earmark-bar-graph-fill"></i> Relatórios
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'horarios' %}">
+                        <i class="bi bi-clock-fill"></i> Horários
+                    </a>
+                </li>
+            </ul>
+
+            <!-- User Menu -->
+            <div class="user-menu">
+                <div class="px-3 py-2">
+                    <h6 class="mb-0"><i class="bi bi-person-circle"></i> {{ request.session.usuario_nome }}</h6>
+                    <small class="text-muted">{{ request.session.usuario_tipo }}</small>
+                </div>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="bi bi-gear"></i> Configurações
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="bi bi-box-arrow-right"></i> Sair
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="form-container">
+                <h2 class="form-title">
+                    <i class="bi bi-clock"></i>
+                    {% if form.instance.pk %}Editar Horário{% else %}Cadastrar Horário{% endif %}
+                </h2>
+
+                <a href="{% url 'horarios' %}" class="btn-voltar"><i class="bi bi-arrow-left"></i> Voltar</a>
+                <p class="mb-4">Preencha os campos abaixo para cadastrar um horário.</p>
+
+                <form method="post"
+                    action="{% if form.instance.pk %}{% url 'editar_horario' form.instance.pk %}{% else %}{% url 'cadastrar_horarios' %}{% endif %}">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+
+                    <div class="form-group">
+                        <label for="{{ form.turma.id_for_label }}" class="form-label">Turma</label>
+                        {{ form.turma|add_class:"form-select" }}
+                        {{ form.turma.errors }}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.hora_entrada.id_for_label }}" class="form-label">Hora de
+                                    Entrada</label>
+                                {{ form.hora_entrada|add_class:"form-control" }}
+                                {{ form.hora_entrada.errors }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.hora_saida.id_for_label }}" class="form-label">Hora de Saída</label>
+                                {{ form.hora_saida|add_class:"form-control" }}
+                                {{ form.hora_saida.errors }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Dias da Semana</label>
+                        {% for day in dias_da_semana %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="dias_semana" value="{{ day }}"
+                                id="dia_{{ forloop.counter }}" {% if day in dias_selecionados %}checked{% endif %}>
+                            <label class="form-check-label" for="dia_{{ forloop.counter }}">{{ day }}</label>
+                        </div>
+                        {% endfor %}
+                        {% if form.errors.dias_semana %}
+                        <div class="text-danger">{{ form.errors.dias_semana }}</div>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn-submit">
+                        <i class="bi bi-save"></i>
+                        {% if form.instance.pk %}EDITAR HORÁRIO{% else %}CADASTRAR HORÁRIO{% endif %}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
