@@ -1,0 +1,248 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RegattaID – Turmas</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+  <style>
+    :root {
+      --roxo-escuro: #4b2e83;
+      --roxo-medio:  #6a3d9a;
+      --lilas:        #b399d4;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f8f9fa;
+      min-height: 100vh;
+    }
+    /* Sidebar */
+    .sidebar {
+      background: linear-gradient(to bottom, var(--roxo-escuro), var(--roxo-medio));
+      color: white;
+      position: fixed;
+      top: 0; bottom: 0; left: 0;
+      width: 250px;
+      padding-top: 20px;
+      overflow-y: auto;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    }
+    .sidebar .nav-link {
+      color: rgba(255,255,255,0.9);
+      padding: 12px 20px;
+      margin: 2px 10px;
+      border-radius: 5px;
+      display: flex; align-items: center;
+      transition: .3s;
+    }
+    .sidebar .nav-link:hover,
+    .sidebar .nav-link.active {
+      background: rgba(255,255,255,0.2);
+      transform: translateX(5px);
+    }
+    .sidebar .nav-link i { margin-right: 12px; font-size:1.1rem; width:20px; }
+    .user-menu {
+      position: absolute; bottom: 0; width: 100%;
+      padding: 15px; background: rgba(0,0,0,0.1);
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* Área principal */
+    .main-content {
+        margin-left: 250px;
+        padding: 20px 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        width: calc(100% - 250px);
+        box-sizing: border-box;
+    }
+
+    .content-container {
+        width: 100%;
+        max-width: 95vw;
+        margin: 0 auto;
+        flex: 1;
+    }
+
+    /* Header */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    .page-title {
+      color: var(--roxo-escuro);
+      font-size: 1.8rem;
+    }
+
+    /* Table of turmas */
+    .turmas-table {
+      width: 100%;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      overflow: hidden;
+    }
+    .turmas-table thead {
+      background: var(--roxo-escuro);
+      color: white;
+    }
+    .turmas-table th {
+      padding: 15px;
+      text-align: left;
+    }
+    .turmas-table td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #eee;
+    }
+    .turmas-table tr:last-child td {
+      border-bottom: none;
+    }
+    .turmas-table tr:hover {
+      background: #f9f9f9;
+    }
+
+    /* Buttons */
+    .btn-add {
+      background: var(--roxo-escuro);
+      color: white;
+      padding: 10px 25px;
+      font-weight: 500;
+    }
+    .btn-action {
+      padding: 5px 10px;
+      margin: 0 3px;
+      font-size: 0.85rem;
+    }
+    .btn-edit {
+      background: var(--roxo-medio);
+      color: white;
+    }
+    .btn-delete {
+      background: #e74c3c;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="px-3 mb-4">
+        <h2 class="text-center"><i class="bi bi-shield-lock"></i> RegattaID</h2>
+      </div>
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'dashboard' %}">
+            <i class="bi bi-speedometer2"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="collapse" href="#usersCollapse">
+            <i class="bi bi-people-fill"></i> Usuários <i class="bi bi-chevron-down float-end"></i>
+          </a>
+          <div class="collapse" id="usersCollapse">
+            <ul class="nav flex-column ps-4">
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'listar_estudantes' %}">Estudantes</a>
+              </li>
+              <li class="nav-item"><a class="nav-link" href="#">Colaboradores</a></li>
+              <li class="nav-item"><a class="nav-link" href="#">Voluntários</a></li>
+              <li class="nav-item"><a class="nav-link" href="#">Visitantes</a></li>
+            </ul>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="{% url 'listar_turmas' %}">
+            <i class="bi bi-journal-bookmark-fill"></i> Turmas
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'relatorio' %}">
+            <i class="bi bi-file-earmark-bar-graph-fill"></i> Relatórios
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'horarios' %}">
+            <i class="bi bi-clock-fill"></i> Horários
+          </a>
+        </li>
+      </ul>
+      <div class="user-menu">
+        <div class="px-3 py-2">
+          <h6 class="mb-0"><i class="bi bi-person-circle"></i> {{ request.session.usuario_nome }}</h6>
+          <small class="text-muted">{{ request.session.usuario_tipo }}</small>
+        </div>
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <i class="bi bi-gear"></i> Configurações
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'logout' %}">
+              <i class="bi bi-box-arrow-right"></i> Sair
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="content-container">
+        <div class="page-header">
+          <h1 class="page-title">Turmas</h1>
+          <a href="{% url 'cadastrar_turma' %}" class="btn btn-add">
+            <i class="bi bi-plus-lg"></i> NOVA TURMA
+          </a>
+        </div>
+
+        <table class="turmas-table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Descrição</th>
+              <th>Qtd. Alunos</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for info in turmas_info %}
+            <tr>
+              <td>{{ info.turma.nome }}</td>
+              <td>{{ info.turma.descricao|default:"—" }}</td>
+              <td>{{ info.qtd_alunos }}</td>
+              <td>
+                <a href="#" class="btn btn-edit btn-action" disabled>
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <a href="#" class="btn btn-delete btn-action" disabled>
+                  <i class="bi bi-trash"></i>
+                </a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="4" class="text-center">Nenhuma turma cadastrada.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,10 +1,12 @@
+{% load static %}
+{% load widget_tweaks %}
 <!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RegattaID - Dashboard</title>
+    <title>RegattaID - Cadastrar Turma</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -19,8 +21,10 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f8f9fa;
+            min-height: 100vh;
         }
 
+        /* Sidebar */
         .sidebar {
             background: linear-gradient(to bottom, var(--roxo-escuro), var(--roxo-medio));
             color: white;
@@ -71,72 +75,62 @@
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
+        /* Área principal */
         .main-content {
             margin-left: 250px;
-            padding: 30px 50px;
-            max-width: 1200px;
-            margin-right: auto;
-            margin-left: auto;
-        }
-
-        .metric-card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
-            height: 100%;
-        }
-
-        .metric-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .metric-card .card-body {
-            padding: 25px;
+            padding: 20px 30px;
+            width: calc(100% - 250px);
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
+            align-items: flex-start;
+            margin-top: 20px;
         }
 
-        .metric-value {
-            font-size: 3rem;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-
-        .log-entry {
-            border-left: 4px solid var(--roxo-medio);
-            padding: 15px 20px;
-            margin-bottom: 15px;
+        .form-container {
             background-color: white;
-            border-radius: 0 5px 5px 0;
-        }
-
-        .dashboard-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .metrics-container {
-            max-width: 900px;
-            margin: 0 auto 40px;
-        }
-
-        .log-container {
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            width: 98%;
             max-width: 800px;
             margin: 0 auto;
         }
 
-        .card-title {
-            font-size: 1.2rem;
-            text-align: center;
+        .form-title {
+            color: var(--roxo-escuro);
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--lilas);
+            padding-bottom: 10px;
         }
 
-        .log-entry {
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--roxo-escuro);
+        }
+
+        .btn-voltar {
+            background: transparent;
+            color: var(--roxo-escuro);
+            margin-bottom: 20px;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .btn-voltar i {
+            margin-right: 5px;
+        }
+
+        .btn-submit {
+            background-color: var(--roxo-escuro);
+            color: white;
+            padding: 10px 30px;
+            font-weight: 500;
+            width: 100%;
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -148,10 +142,9 @@
             <div class="px-3 mb-4">
                 <h2 class="text-center"><i class="bi bi-shield-lock"></i> RegattaID</h2>
             </div>
-
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link active" href="#">
+                    <a class="nav-link" href="{% url 'dashboard' %}">
                         <i class="bi bi-speedometer2"></i> Dashboard
                     </a>
                 </li>
@@ -162,7 +155,7 @@
                     <div class="collapse" id="usersCollapse">
                         <ul class="nav flex-column ps-4">
                             <li class="nav-item">
-                                <a class="nav-link" href="estudantes.html">Estudantes</a>
+                                <a class="nav-link" href="{% url 'listar_estudantes' %}">Estudantes</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="#">Colaboradores</a>
@@ -173,34 +166,29 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="#">Visitantes</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">User</a>
-                            </li>
                         </ul>
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link active" href="{% url 'listar_turmas' %}">
                         <i class="bi bi-journal-bookmark-fill"></i> Turmas
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="relatorio.html">
+                    <a class="nav-link" href="{% url 'relatorio' %}">
                         <i class="bi bi-file-earmark-bar-graph-fill"></i> Relatórios
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link" href="{% url 'horarios' %}">
                         <i class="bi bi-clock-fill"></i> Horários
                     </a>
                 </li>
             </ul>
-
-            <!-- User Menu -->
             <div class="user-menu">
                 <div class="px-3 py-2">
-                    <h6 class="mb-0"><i class="bi bi-person-circle"></i> Pedro Tabada</h6>
-                    <small class="text-muted">Administrador</small>
+                    <h6 class="mb-0"><i class="bi bi-person-circle"></i> {{ request.session.usuario_nome }}</h6>
+                    <small class="text-muted">{{ request.session.usuario_tipo }}</small>
                 </div>
                 <ul class="nav flex-column">
                     <li class="nav-item">
@@ -209,7 +197,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link" href="{% url 'logout' %}">
                             <i class="bi bi-box-arrow-right"></i> Sair
                         </a>
                     </li>
@@ -219,70 +207,39 @@
 
         <!-- Main Content -->
         <div class="main-content">
-            <h2 class="mb-4"><i class="bi bi-speedometer2"></i> Dashboard</h2>
+            <div class="form-container">
 
-            <!-- Metrics Row -->
-            <div class="row mb-4">
-                <div class="col-md-4">
-                    <div class="card metric-card">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Usuários Ativos</h5>
-                            <div class="metric-value text-primary">10/10</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card metric-card">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Visitas Ativas</h5>
-                            <div class="metric-value text-warning">0/0</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card metric-card">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Credenciais Ativas</h5>
-                            <div class="metric-value text-success">20/20</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                <h2 class="form-title"><i class="bi bi-journal-plus"></i> Cadastrar Turma</h2>
+                <a href="{% url 'listar_turmas' %}" class="btn-voltar">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
 
-            <!-- Log de Eventos -->
-            <div class="card mb-4">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0"><i class="bi bi-list-check"></i> LOG DE EVENTOS</h5>
-                </div>
-                <div class="card-body">
-                    <div class="log-entry">
-                        <div class="d-flex justify-content-between">
-                            <strong>17:15 - Pedro Seiji</strong>
-                            <small class="text-muted">Ponto de Acesso - Entrada 1</small>
-                        </div>
-                        <p class="mb-0">Detalhe: Entrada Liberada</p>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+
+                    <div class="form-group">
+                        <label for="{{ form.nome.id_for_label }}" class="form-label">Nome da Turma</label>
+                        {{ form.nome|add_class:"form-control" }}
+                        {{ form.nome.errors }}
                     </div>
-                    <div class="log-entry">
-                        <div class="d-flex justify-content-between">
-                            <strong>17:10 - Fulano</strong>
-                            <small class="text-muted">Ponto de Acesso - Entrada 2</small>
-                        </div>
-                        <p class="mb-0">Detalhe: Entrada Liberada</p>
+
+                    <div class="form-group">
+                        <label for="{{ form.descricao.id_for_label }}" class="form-label">Descrição</label>
+                        {{ form.descricao|add_class:"form-control" }}
+                        {{ form.descricao.errors }}
                     </div>
-                </div>
+
+                    <button type="submit" class="btn-submit">
+                        <i class="bi bi-save"></i> Salvar Turma
+                    </button>
+                </form>
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
+    <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Ativar tooltips
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        });
-    </script>
 </body>
 
 </html>

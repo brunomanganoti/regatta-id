@@ -190,18 +190,18 @@
 
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link" href="dashboard.html">
+                    <a class="nav-link active" href="#">
                         <i class="bi bi-speedometer2"></i> Dashboard
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" data-bs-toggle="collapse" href="#usersCollapse">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#usersCollapse">
                         <i class="bi bi-people-fill"></i> Usuários <i class="bi bi-chevron-down float-end"></i>
                     </a>
-                    <div class="collapse show" id="usersCollapse">
+                    <div class="collapse" id="usersCollapse">
                         <ul class="nav flex-column ps-4">
                             <li class="nav-item">
-                                <a class="nav-link active" href="#">Estudantes</a>
+                                <a class="nav-link" href="{% url 'listar_estudantes' %}">Estudantes</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="#">Colaboradores</a>
@@ -212,24 +212,21 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="#">Visitantes</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">User</a>
-                            </li>
                         </ul>
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link" href="{% url 'listar_turmas' %}">
                         <i class="bi bi-journal-bookmark-fill"></i> Turmas
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="relatorio.html">
+                    <a class="nav-link" href="{% url 'relatorio' %}">
                         <i class="bi bi-file-earmark-bar-graph-fill"></i> Relatórios
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link" href="{% url 'horarios' %}">
                         <i class="bi bi-clock-fill"></i> Horários
                     </a>
                 </li>
@@ -238,8 +235,8 @@
             <!-- User Menu -->
             <div class="user-menu">
                 <div class="px-3 py-2">
-                    <h6 class="mb-0"><i class="bi bi-person-circle"></i> Pedro Tabada</h6>
-                    <small class="text-muted">Administrador</small>
+                    <h6 class="mb-0"><i class="bi bi-person-circle"></i> {{ request.session.usuario_nome }}</h6>
+                    <small class="text-muted">{{ request.session.usuario_tipo }}</small>
                 </div>
                 <ul class="nav flex-column">
                     <li class="nav-item">
@@ -261,7 +258,7 @@
             <div class="content-container">
                 <div class="page-header">
                     <h1 class="page-title">Estudantes</h1>
-                    <a href="cadastroestudante.html" class="btn btn-add">
+                    <a href="{% url 'cadastrar_estudante' %}" class="btn btn-add">
                         <i class="bi bi-plus-lg"></i> CADASTRAR ESTUDANTE
                     </a>
                 </div>
@@ -292,39 +289,35 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for info in estudantes_info %}
                         <tr>
-                            <td>Fulano</td>
-                            <td>Fulano@gmmail.com</td>
-                            <td>730.547.776-00</td>
-                            <td>Turma A</td>
-                            <td>08/12/2021</td>
+                            <td>{{ info.estudante.nome }}</td>
+                            <td>{{ info.estudante.email }}</td>
+                            <td>{{ info.estudante.cpf }}</td>
+                            <td>{{ info.turma|default:"–" }}</td>
                             <td>
-                                <button class="btn btn-edit btn-action"><i class="bi bi-pencil"></i></button>
-                                <button class="btn btn-delete btn-action"><i class="bi bi-trash"></i></button>
+                                {% if info.data_inicio %}
+                                {{ info.data_inicio|date:"d/m/Y" }}
+                                {% else %}
+                                –
+                                {% endif %}
+                            <td>
+                                <a href="{% url 'editar_estudante' info.estudante.id %}"
+                                    class="btn btn-edit btn-action">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+
+                                <form action="{% url 'excluir_estudante' info.estudante.id %}" method="post"
+                                    style="display:inline;"
+                                    onsubmit="return confirm('Confirma exclusão deste aluno?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-delete btn-action">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
-                        <tr>
-                            <td>Beltrano</td>
-                            <td>beltrano@email.com</td>
-                            <td>123.456.789-00</td>
-                            <td>Turma B</td>
-                            <td>15/03/2022</td>
-                            <td>
-                                <button class="btn btn-edit btn-action"><i class="bi bi-pencil"></i></button>
-                                <button class="btn btn-delete btn-action"><i class="bi bi-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Sicrano</td>
-                            <td>sicrano@escola.com</td>
-                            <td>987.654.321-00</td>
-                            <td>Turma C</td>
-                            <td>22/07/2022</td>
-                            <td>
-                                <button class="btn btn-edit btn-action"><i class="bi bi-pencil"></i></button>
-                                <button class="btn btn-delete btn-action"><i class="bi bi-trash"></i></button>
-                            </td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
