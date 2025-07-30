@@ -3,14 +3,12 @@ from django.conf import settings
 from django.conf.urls.static import static
 from . import views
 
-app_name = 'regatta_id_app'
-
 urlpatterns = [
     # Auth & Home
     path('',                 views.root_redirect_view, name='root'),
-    path('login/',           views.login_view,         name='login'),
+    path('login/',           views.LoginView.as_view(),  name='login'),
     path('logout/',          views.logout_view,        name='logout'),
-    path('dashboard/',       views.dashboard_view,     name='dashboard'),
+    path('dashboard/',       views.dashboard,          name='dashboard'),
 
     # Estudantes
     path('estudantes/',                      views.listar_estudantes,    name='listar_estudantes'),
@@ -40,16 +38,16 @@ urlpatterns = [
     path('relatorio/',        views.relatorio_view,      name='relatorio'),
 
     # Turmas
-    path('turmas/',                      views.listar_turmas,     name='listar_turmas'),
-    path('turmas/novo/',                 views.cadastrar_turma,   name='cadastrar_turma'),
-    path('turmas/<int:pk>/editar/',      views.editar_turma,      name='editar_turma'),
-    path('turmas/<int:pk>/excluir/',     views.excluir_turma,     name='excluir_turma'),
+    path("turmas/",                      views.listar_turmas,   name="listar_turmas"),
+    path("turmas/novo/",                  views.cadastrar_turma, name="cadastrar_turma"),
+    path("turmas/<int:pk>/editar/",       views.editar_turma,    name="editar_turma"),
+    path("turmas/<int:pk>/excluir/",      views.excluir_turma,   name="excluir_turma"),
 
-    # Horários
-    path('horarios/',                         views.listar_horarios,      name='listar_horarios'),
-    path('horarios/novo/',                    views.cadastrar_horario,    name='cadastrar_horario'),
-    path('horarios/<int:horario_id>/editar/', views.editar_horario,       name='editar_horario'),
-    path('horarios/<int:horario_id>/excluir/',views.excluir_horario,      name='excluir_horario'),
+    # Horários da turma
+    path("turmas/<int:turma_id>/horarios/",             views.listar_horarios,   name="listar_horarios"),
+    path("turmas/<int:turma_id>/horarios/novo/",        views.cadastrar_horario, name="cadastrar_horario"),
+    path("horarios/<int:pk>/editar/",                   views.editar_horario,    name="editar_horario"),
+    path("horarios/<int:pk>/excluir/",                  views.excluir_horario,   name="excluir_horario"),
 
     # Matrículas (AlunoTurma)
     path('matriculas/',                   views.listar_matriculas,      name='listar_matriculas'),

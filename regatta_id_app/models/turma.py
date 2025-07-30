@@ -1,12 +1,14 @@
 from django.db import models
-from .usuario import Usuario  # referência cruzada
+from .usuario import Usuario  # se ainda precisar
 
 class Turma(models.Model):
-    nome       = models.CharField(max_length=255)
-    descricao  = models.TextField(blank=True, null=True)
+    nome        = models.CharField(max_length=255)
+    descricao   = models.TextField(blank=True, null=True)
+    codigo      = models.CharField(max_length=20, blank=True, null=True)
 
     def __str__(self):
-        return self.nome
+        return f"{self.nome} ({self.codigo})"
+
 
 
 class AlunoTurma(models.Model):

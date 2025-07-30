@@ -1,4 +1,4 @@
-from django.core import forms
+from django import forms
 from ..models import Horario
 
 DIAS_SEMANA_CHOICES = [
@@ -14,11 +14,13 @@ DIAS_SEMANA_CHOICES = [
 class HorarioForm(forms.ModelForm):
     dias_semana = forms.MultipleChoiceField(
         choices=DIAS_SEMANA_CHOICES,
-        widget=forms.CheckboxSelectMultiple,
+        widget=forms.SelectMultiple(attrs={
+            'class': 'form-select',
+            'multiple': 'multiple',
+        }),
         label='Dias da Semana',
         required=True
     )
-
     class Meta:
         model = Horario
         fields = ['turma', 'hora_entrada', 'hora_saida', 'dias_semana']

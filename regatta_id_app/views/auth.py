@@ -1,37 +1,77 @@
-from django.shortcuts import render, redirect
+from django import forms
+from django.urls import reverse_lazy
+from django.views.generic import FormView
+from django.shortcuts import redirect
 from ..models import Usuario
-from .decorator import login_required_custom, admin_required
 
 def root_redirect_view(request):
     if request.session.get('usuario_id'):
         return redirect('dashboard')
     return redirect('login')
 
-def login_view(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        senha = request.POST.get('password')
+class LoginForm(forms.Form):
+    """
+    Formulário simples para autenticação por e-mail e senha.
+    """
+    email = forms.EmailField(
+        widget=forms.EmailInput(
+            attrs={
+                "class": "form-control form-control-lg",
+                "placeholder": "Entre com seu E-mail",
+                "required": "required",
+            }
+        )
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control form-control-lg",
+                "placeholder": "Entre com sua senha",
+                "required": "required",
+            }
+        )
+    )
+
+    def clean(self):
+        cleaned = super().clean()
+        email = cleaned.get("email")
+        senha = cleaned.get("password")
+
         try:
-            u = Usuario.objects.get(email=email, senha=senha, ativo=True)
+            user = Usuario.objects.get(email=email, senha=senha, ativo=True)
         except Usuario.DoesNotExist:
-            request.session.flush()
-            return render(request, 'regatta_id_app/sistema/login.html',
-                          {'error': 'Email ou senha inválidos.'})
+            raise forms.ValidationError("Email ou senha inválidos.")
 
-        if not u.acessos.filter(nivel_acesso='admin', autorizado=True).exists():
-            return render(request, 'regatta_id_app/sistema/login.html',
-                          {'error': 'Acesso permitido apenas para administradores.'})
+        # exige permissão de administrador
+        if not user.acessos.filter(nivel_acesso="admin", autorizado=True).exists():
+            raise forms.ValidationError("Acesso permitido apenas para administradores.")
 
-        request.session['usuario_id']   = u.id
-        request.session['usuario_nome'] = u.nome
-        return redirect('dashboard')
+        cleaned["user"] = user
+        return cleaned
+class LoginView(FormView):
+    """
+    View de autenticação usando `FormView` para separar regras de negócio
+    da apresentação e aproveitar validação de formulário.
+    """
+    template_name = "sistema/login.html"
+    form_class = LoginForm
+    success_url = reverse_lazy("dashboard")
 
-    return render(request, 'regatta_id_app/sistema/login.html')
+    # evita que usuário logado veja novamente a tela de login
+    def dispatch(self, request, *args, **kwargs):
+        if request.session.get("usuario_id"):
+            return redirect("dashboard")
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        user = form.cleaned_data["user"]
+        # popula sessão
+        self.request.session["usuario_id"] = user.id
+        self.request.session["usuario_nome"] = user.nome
+        return super().form_valid(form)
+
 
 def logout_view(request):
     request.session.flush()
     return redirect('login')
 
-@admin_required
-def dashboard_view(request):
-    return render(request, 'regatta_id_app/sistema/dashboard.html')

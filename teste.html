@@ -1,13 +1,14 @@
 {% load static %}
-{% load widget_tweaks %}
 <!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RegattaID - {% if form.instance.pk %}Editar Horário{% else %}Cadastrar Horário{% endif %}</title>
+    <title>RegattaID - Dashboard</title>
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
         :root {
@@ -17,23 +18,20 @@
         }
 
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #f8f9fa;
-            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
         }
 
         .sidebar {
             background: linear-gradient(to bottom, var(--roxo-escuro), var(--roxo-medio));
             color: white;
+            height: 100vh;
             position: fixed;
-            top: 0;
-            bottom: 0;
-            left: 0;
             width: 250px;
             padding-top: 20px;
             overflow-y: auto;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
             z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
         }
 
         .sidebar .nav-link {
@@ -41,85 +39,105 @@
             padding: 12px 20px;
             margin: 2px 10px;
             border-radius: 5px;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            transition: .3s;
         }
 
-        .sidebar .nav-link:hover,
-        .sidebar .nav-link.active {
-            background: rgba(255, 255, 255, 0.2);
+        .sidebar .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.15);
             transform: translateX(5px);
+        }
+
+        .sidebar .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            font-weight: 500;
+            box-shadow: inset 3px 0 0 var(--lilas);
         }
 
         .sidebar .nav-link i {
             margin-right: 12px;
             font-size: 1.1rem;
             width: 20px;
+            text-align: center;
         }
 
         .user-menu {
             position: absolute;
             bottom: 0;
-            width: 100%;
+            left: 0;
+            right: 0;
             padding: 15px;
-            background: rgba(0, 0, 0, 0.1);
+            background-color: rgba(0, 0, 0, 0.1);
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .main-content {
             margin-left: 250px;
-            padding: 20px 30px;
-            width: calc(100% - 250px);
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            margin-top: 20px;
+            padding: 30px 50px;
+            max-width: 1200px;
+            margin-right: auto;
+            margin-left: auto;
         }
 
-        .form-container {
-            background: white;
+        .metric-card {
+            border: none;
             border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            padding: 30px;
-            width: 98%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            height: 100%;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .metric-card .card-body {
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .metric-value {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .log-entry {
+            border-left: 4px solid var(--roxo-medio);
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            background-color: white;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .metrics-container {
+            max-width: 900px;
+            margin: 0 auto 40px;
+        }
+
+        .log-container {
             max-width: 800px;
+            margin: 0 auto;
         }
 
-        .form-title {
-            color: var(--roxo-escuro);
-            margin-bottom: 25px;
-            border-bottom: 2px solid var(--lilas);
-            padding-bottom: 10px;
+        .card-title {
+            font-size: 1.2rem;
+            text-align: center;
         }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            font-weight: 500;
-            color: var(--roxo-escuro);
-        }
-
-        .btn-voltar {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: var(--roxo-escuro);
-            text-decoration: none;
-        }
-
-        .btn-voltar i {
-            margin-right: 5px;
-        }
-
-        .btn-submit {
-            background: var(--roxo-escuro);
-            color: white;
-            padding: 10px 30px;
-            font-weight: 500;
-            width: 100%;
-            margin-top: 20px;
+        .log-entry {
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
         }
     </style>
 </head>
@@ -197,70 +215,73 @@
             </div>
         </div>
 
-        <!-- Main Content -->
         <div class="main-content">
-            <div class="form-container">
-                <h2 class="form-title">
-                    <i class="bi bi-clock"></i>
-                    {% if form.instance.pk %}Editar Horário{% else %}Cadastrar Horário{% endif %}
-                </h2>
+            <h2 class="mb-4"><i class="bi bi-speedometer2"></i> Dashboard</h2>
 
-                <a href="{% url 'horarios' %}" class="btn-voltar"><i class="bi bi-arrow-left"></i> Voltar</a>
-                <p class="mb-4">Preencha os campos abaixo para cadastrar um horário.</p>
-
-                <form method="post"
-                    action="{% if form.instance.pk %}{% url 'editar_horario' form.instance.pk %}{% else %}{% url 'cadastrar_horarios' %}{% endif %}">
-                    {% csrf_token %}
-                    {{ form.non_field_errors }}
-
-                    <div class="form-group">
-                        <label for="{{ form.turma.id_for_label }}" class="form-label">Turma</label>
-                        {{ form.turma|add_class:"form-select" }}
-                        {{ form.turma.errors }}
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="{{ form.hora_entrada.id_for_label }}" class="form-label">Hora de
-                                    Entrada</label>
-                                {{ form.hora_entrada|add_class:"form-control" }}
-                                {{ form.hora_entrada.errors }}
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="{{ form.hora_saida.id_for_label }}" class="form-label">Hora de Saída</label>
-                                {{ form.hora_saida|add_class:"form-control" }}
-                                {{ form.hora_saida.errors }}
-                            </div>
+            <!-- Metrics Row -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card metric-card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Usuários Ativos</h5>
+                            <div class="metric-value text-primary">10/10</div>
                         </div>
                     </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Dias da Semana</label>
-                        {% for day in dias_da_semana %}
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="dias_semana" value="{{ day }}"
-                                id="dia_{{ forloop.counter }}" {% if day in dias_selecionados %}checked{% endif %}>
-                            <label class="form-check-label" for="dia_{{ forloop.counter }}">{{ day }}</label>
+                </div>
+                <div class="col-md-4">
+                    <div class="card metric-card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Visitas Ativas</h5>
+                            <div class="metric-value text-warning">0/0</div>
                         </div>
-                        {% endfor %}
-                        {% if form.errors.dias_semana %}
-                        <div class="text-danger">{{ form.errors.dias_semana }}</div>
-                        {% endif %}
                     </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card metric-card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Credenciais Ativas</h5>
+                            <div class="metric-value text-success">20/20</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                    <button type="submit" class="btn-submit">
-                        <i class="bi bi-save"></i>
-                        {% if form.instance.pk %}EDITAR HORÁRIO{% else %}CADASTRAR HORÁRIO{% endif %}
-                    </button>
-                </form>
+            <!-- Log de Eventos -->
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-list-check"></i> LOG DE EVENTOS</h5>
+                </div>
+                <div class="card-body">
+                    <div class="log-entry">
+                        <div class="d-flex justify-content-between">
+                            <strong>17:15 - Pedro Seiji</strong>
+                            <small class="text-muted">Ponto de Acesso - Entrada 1</small>
+                        </div>
+                        <p class="mb-0">Detalhe: Entrada Liberada</p>
+                    </div>
+                    <div class="log-entry">
+                        <div class="d-flex justify-content-between">
+                            <strong>17:10 - Fulano</strong>
+                            <small class="text-muted">Ponto de Acesso - Entrada 2</small>
+                        </div>
+                        <p class="mb-0">Detalhe: Entrada Liberada</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
 
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Ativar tooltips
+        var tooltipTriggerList = [].slice.call(
+            document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        )
+        tooltipTriggerList.map(function (el) {
+            return new bootstrap.Tooltip(el)
+        })
+    </script>
+</body>
 </html>

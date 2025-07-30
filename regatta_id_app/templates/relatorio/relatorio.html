@@ -1,209 +1,53 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RegattaID - Relatórios</title>
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Bootstrap Icons -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-  <style>
-    :root {
-      --roxo-escuro: #4b2e83;
-      --roxo-medio: #6a3d9a;
-      --lilas: #b399d4;
-    }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f8f9fa;
-      min-height: 100vh;
-    }
-    /* Sidebar */
-    .sidebar {
-      background: linear-gradient(to bottom, var(--roxo-escuro), var(--roxo-medio));
-      color: white;
-      height: 100vh;
-      position: fixed;
-      width: 250px;
-      padding-top: 20px;
-      overflow-y: auto;
-      z-index: 1000;
-      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-    }
-    .sidebar .nav-link {
-      color: rgba(255, 255, 255, 0.9);
-      padding: 12px 20px;
-      margin: 2px 10px;
-      border-radius: 5px;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-    }
-    .sidebar .nav-link:hover {
-      background-color: rgba(255, 255, 255, 0.15);
-      transform: translateX(5px);
-    }
-    .sidebar .nav-link.active {
-      background-color: rgba(255, 255, 255, 0.2);
-      font-weight: 500;
-      box-shadow: inset 3px 0 0 var(--lilas);
-    }
-    .sidebar .nav-link i {
-      margin-right: 12px;
-      font-size: 1.1rem;
-      width: 20px;
-      text-align: center;
-    }
-    .user-menu {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 15px;
-      background-color: rgba(0, 0, 0, 0.1);
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    /* Main */
-    .main-content {
-      margin-left: 250px;
-      padding: 30px 50px;
-      flex: 1;
-      width: calc(100% - 250px);
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    .report-container {
-      background-color: white;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      padding: 30px;
-      margin-bottom: 30px;
-    }
-    .filter-section + .filter-section {
-      margin-top: 20px;
-    }
-    .filter-title {
-      color: var(--roxo-escuro);
-      font-weight: 600;
-      margin-bottom: 15px;
-      display: flex;
-      align-items: center;
-    }
-    .filter-title i {
-      margin-right: 10px;
-    }
-    .filter-options, .date-filters, .export-options {
-      margin-top: 10px;
-    }
-    .export-btn {
-      background-color: var(--roxo-escuro);
-      color: white;
-      font-weight: 600;
-      padding: 10px 30px;
-      margin-top: 30px;
-    }
-    .form-check-input:checked {
-      background-color: var(--roxo-escuro);
-      border-color: var(--roxo-escuro);
-    }
-  </style>
+  {# Cabeçalho genérico (meta, bootstrap, icons) #}
+  {% include 'partials/head.html' %}
+  {# Estilos específicos de relatório #}
+  {% include 'partials/report_styles.html' %}
 </head>
+
 <body>
   <div class="d-flex">
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <div class="px-3 mb-4">
-        <h2 class="text-center"><i class="bi bi-shield-lock"></i> RegattaID</h2>
-      </div>
+    {# Sidebar compartilhada #}
+    {% include 'partials/sidebar.html' %}
 
-      <ul class="nav flex-column">
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'dashboard' %}">
-            <i class="bi bi-speedometer2"></i> Dashboard
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" data-bs-toggle="collapse" href="#usersCollapse" role="button"
-             aria-expanded="false" aria-controls="usersCollapse">
-            <i class="bi bi-people-fill"></i> Usuários
-            <i class="bi bi-chevron-down float-end"></i>
-          </a>
-          <div class="collapse" id="usersCollapse">
-            <ul class="nav flex-column ps-4">
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'listar_estudantes' %}">Estudantes</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'listar_turmas' %}">Turmas</a>
-              </li>
-            </ul>
-          </div>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link active" href="{% url 'relatorio' %}">
-            <i class="bi bi-file-earmark-bar-graph-fill"></i> Relatórios
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'horarios' %}">
-            <i class="bi bi-clock-fill"></i> Horários
-          </a>
-        </li>
-      </ul>
-
-      <!-- User Menu -->
-      <div class="user-menu">
-        <div class="px-3 py-2">
-          <h6 class="mb-0"><i class="bi bi-person-circle"></i> {{ request.session.usuario_nome }}</h6>
-          <small class="text-muted">Administrador</small>
-        </div>
-        <ul class="nav flex-column">
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <i class="bi bi-gear"></i> Configurações
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'logout' %}">
-              <i class="bi bi-box-arrow-right"></i> Sair
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
-    
-    <!-- Main Content -->
     <div class="main-content">
       <div class="report-container">
-        <h2 class="mb-4"><i class="bi bi-file-earmark-bar-graph-fill"></i> Relatórios</h2>
-        
-        <!-- Filtro por Tipo de Usuário -->
+        <h2 class="mb-4">
+          <i class="bi bi-file-earmark-bar-graph-fill"></i> Relatórios
+        </h2>
+
+        {# — Filtro por Tipo de Usuário — #}
         <div class="filter-section">
           <div class="filter-title">
             <i class="bi bi-funnel"></i> Filtrar por Tipo
           </div>
           <div class="filter-options">
             <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="filter-student" data-target="student-search">
+              <input class="form-check-input" type="checkbox"
+                     id="filter-student" data-target="student-search">
               <label class="form-check-label" for="filter-student">Estudante</label>
               <div id="student-search" class="mt-2" style="display:none;">
-                <input type="text" class="form-control" placeholder="Digite o nome do estudante">
+                <input type="text" class="form-control"
+                       placeholder="Digite o nome do estudante">
               </div>
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="filter-class" data-target="class-search">
+              <input class="form-check-input" type="checkbox"
+                     id="filter-class" data-target="class-search">
               <label class="form-check-label" for="filter-class">Turma</label>
               <div id="class-search" class="mt-2" style="display:none;">
-                <input type="text" class="form-control" placeholder="Digite o nome da turma">
+                <input type="text" class="form-control"
+                       placeholder="Digite o nome da turma">
               </div>
             </div>
-            <!-- adicione mais filtros se quiser -->
           </div>
         </div>
-        
-        <!-- Filtro por Data -->
+
+        {# — Filtro por Data — #}
         <div class="filter-section">
           <div class="filter-title">
             <i class="bi bi-calendar"></i> Filtrar por Data
@@ -219,29 +63,32 @@
             </div>
           </div>
         </div>
-        
-        <!-- Formato de Exportação -->
+
+        {# — Formato de Exportação — #}
         <div class="filter-section">
           <div class="filter-title">
             <i class="bi bi-download"></i> Formato de Exportação
           </div>
           <div class="export-options">
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="exportFormat" id="csv" checked>
+              <input class="form-check-input" type="radio"
+                     name="exportFormat" id="csv" checked>
               <label class="form-check-label" for="csv">CSV</label>
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="exportFormat" id="excel">
+              <input class="form-check-input" type="radio"
+                     name="exportFormat" id="excel">
               <label class="form-check-label" for="excel">Excel</label>
             </div>
             <div class="form-check">
-              <input class="form-check-input" type="radio" name="exportFormat" id="pdf">
+              <input class="form-check-input" type="radio"
+                     name="exportFormat" id="pdf">
               <label class="form-check-label" for="pdf">PDF</label>
             </div>
           </div>
         </div>
-        
-        <!-- Botão Exportar -->
+
+        {# — Botão Exportar — #}
         <div class="text-center">
           <button class="btn export-btn">
             <i class="bi bi-download"></i> EXPORTAR RELATÓRIO
@@ -251,25 +98,7 @@
     </div>
   </div>
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- Toggle filtros -->
-  <script>
-    document.querySelectorAll('.form-check-input').forEach(cb => {
-      cb.addEventListener('change', () => {
-        const target = document.getElementById(cb.dataset.target);
-        target.style.display = cb.checked ? 'block' : 'none';
-        // desmarca os outros para um filtro por vez
-        if (cb.checked) {
-          document.querySelectorAll('.filter-options .form-check-input').forEach(o => {
-            if (o !== cb) {
-              o.checked = false;
-              document.getElementById(o.dataset.target).style.display = 'none';
-            }
-          });
-        }
-      });
-    });
-  </script>
+  {# Scripts genéricos (Bootstrap, tooltips) #}
+  {% include 'partials/footer.html' %}
 </body>
 </html>

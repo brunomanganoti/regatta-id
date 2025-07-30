@@ -1,5 +1,6 @@
-from django.core import forms, re
+from django import forms
 from django.core.exceptions import ValidationError
+import re
 from ..models import Usuario
 
 class UsuarioForm(forms.ModelForm):

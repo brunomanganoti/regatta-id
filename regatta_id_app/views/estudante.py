@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Prefetch
 from ..models import Turma, Usuario, AlunoTurma
 from ..forms import UsuarioForm
 from .decorator import admin_required
@@ -48,7 +49,7 @@ def _salvar_estudante(request, instance=None):
             df    = ultima.data_fim
 
     return render(request,
-                  'regatta_id_app/estudantes/cadastroestudante.html',
+                  'estudante/cadastro_estudante.html',
                   {
                     'form': form,
                     'turmas': turmas,
@@ -59,23 +60,38 @@ def _salvar_estudante(request, instance=None):
 
 @admin_required
 def listar_estudantes(request):
+    """
+    Lista todos os alunos com a última turma em que estiveram matriculados,
+    realizando prefetch para evitar N+1 queries.
+    """
+    alunos = (
+        Usuario.objects
+        .filter(perfil='aluno')
+        .prefetch_related(
+            Prefetch(
+                'turmas_aluno',                                 # related_name do FK em AlunoTurma
+                queryset=AlunoTurma.objects
+                    .select_related('turma')
+                    .order_by('-data_inicio'),
+                to_attr='historico_turmas'                      # turmas ordenadas ficam neste atributo
+            )
+        )
+    )
+
     estudantes_info = []
-    # pega só os alunos
-    for aluno in Usuario.objects.filter(perfil='aluno'):
-        # usa o related_name para economizar query
-        ultima = aluno.turmas_aluno.order_by('-data_inicio').first()
+    for aluno in alunos:
+        ultima = aluno.historico_turmas[0] if aluno.historico_turmas else None
         estudantes_info.append({
             'estudante':   aluno,
-            'turma':       ultima.turma.nome    if ultima else None,
-            'data_inicio': ultima.data_inicio   if ultima else None,
+            'turma':       ultima.turma.nome if ultima else None,
+            'data_inicio': ultima.data_inicio if ultima else None,
         })
 
-    return render(request,
-                  'regatta_id_app/estudantes/estudantes.html',
-                  {'estudantes_info': estudantes_info})
-
-    return _salvar_estudante(request)
-
+    return render(
+        request,
+        'estudante/estudante.html',
+        {'estudantes_info': estudantes_info},
+    )
 @admin_required
 def cadastrar_estudante(request):
     return _salvar_estudante(request)

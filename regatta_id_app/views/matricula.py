@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from ..models import AlunoTurma
-from ..forms import AlunoTurmaForm
 from .decorator import admin_required
 
 @admin_required

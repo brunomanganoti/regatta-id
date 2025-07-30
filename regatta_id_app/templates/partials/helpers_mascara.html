@@ -1,0 +1,39 @@
+<!-- templates/partials/helpees_mascara.html -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // helpers de máscara
+        function maskCPF(v) {
+            v = v.replace(/\D/g, '').slice(0, 11);
+            v = v.replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})\.(\d{3})(\d)/, '$1.$2.$3')
+                .replace(/(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4');
+            return v;
+        }
+        function maskTel(v) {
+            v = v.replace(/\D/g, '').slice(0, 11);
+            if (v.length > 10) v = v.replace(/^(\d{2})(\d{5})(\d+)/, '($1) $2-$3');
+            else v = v.replace(/^(\d{2})(\d{4})(\d+)/, '($1) $2-$3');
+            return v;
+        }
+
+        // CPF
+        const cpfInput = document.getElementById('id_cpf');
+        if (cpfInput) {
+            // aplica já ao valor existente
+            cpfInput.value = maskCPF(cpfInput.value);
+            // reaplica ao editar
+            cpfInput.addEventListener('input', e => {
+                e.target.value = maskCPF(e.target.value);
+            });
+        }
+
+        // Telefone
+        const telInput = document.getElementById('id_telefone');
+        if (telInput) {
+            telInput.value = maskTel(telInput.value);
+            telInput.addEventListener('input', e => {
+                e.target.value = maskTel(e.target.value);
+            });
+        }
+    });
+</script>

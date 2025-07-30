@@ -7,3 +7,4 @@ class EventoCritico(models.Model):
     tipo_evento = models.CharField(max_length=255)
     descricao   = models.TextField(blank=True, null=True)
     data_evento = models.DateTimeField(auto_now_add=True)
+    

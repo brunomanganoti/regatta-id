@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from ..models import AcessoRegistrado
-from ..forms import AcessoRegistradoForm
 from .decorator import admin_required
 
 @admin_required

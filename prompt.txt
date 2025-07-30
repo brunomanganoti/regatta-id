@@ -1,0 +1,770 @@
+Crie uma view Django funcional que exiba dados reais do banco de dados, utilizando os modelos e formulários já existentes.
+
+A view que vamos trabalhar é: relatorio.html
+
+Use boas práticas de organização de código e, se for aplicável, refatore a view para utilizar partials reutilizáveis já definidos no projeto. se precisar dos model para implementação me avise e aponte oque precisa:
+
+Ao final, me entregue os seguintes itens, conforme necessário, se atente somente oque foi pedido, nenhum dos itens é obrigatorios se não relevantes:
+
+    Código final da view (se houver alteração ou nova criação).
+
+    Template renderizado final após aplicar os partials (não apenas a view que os chama, mas o conteúdo já integrado).
+
+    Código de qualquer partial novo criado como resultado dessa view.
+
+    Código atualizado ou novo do model.
+
+    Formulário utilizado ou novo, com código completo.
+
+    Linha correspondente no urls.py para registrar a nova view.
+
+Contexto do projeto:
+
+Template que vamos trabalhar: relatorio.html
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RegattaID - Relatórios</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <style>
+    :root {
+      --roxo-escuro: #4b2e83;
+      --roxo-medio: #6a3d9a;
+      --lilas: #b399d4;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+      min-height: 100vh;
+    }
+    /* Sidebar */
+    .sidebar {
+      background: linear-gradient(to bottom, var(--roxo-escuro), var(--roxo-medio));
+      color: white;
+      height: 100vh;
+      position: fixed;
+      width: 250px;
+      padding-top: 20px;
+      overflow-y: auto;
+      z-index: 1000;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .sidebar .nav-link {
+      color: rgba(255, 255, 255, 0.9);
+      padding: 12px 20px;
+      margin: 2px 10px;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+    }
+    .sidebar .nav-link:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+      transform: translateX(5px);
+    }
+    .sidebar .nav-link.active {
+      background-color: rgba(255, 255, 255, 0.2);
+      font-weight: 500;
+      box-shadow: inset 3px 0 0 var(--lilas);
+    }
+    .sidebar .nav-link i {
+      margin-right: 12px;
+      font-size: 1.1rem;
+      width: 20px;
+      text-align: center;
+    }
+    .user-menu {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 15px;
+      background-color: rgba(0, 0, 0, 0.1);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    /* Main */
+    .main-content {
+      margin-left: 250px;
+      padding: 30px 50px;
+      flex: 1;
+      width: calc(100% - 250px);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .report-container {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      margin-bottom: 30px;
+    }
+    .filter-section + .filter-section {
+      margin-top: 20px;
+    }
+    .filter-title {
+      color: var(--roxo-escuro);
+      font-weight: 600;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+    }
+    .filter-title i {
+      margin-right: 10px;
+    }
+    .filter-options, .date-filters, .export-options {
+      margin-top: 10px;
+    }
+    .export-btn {
+      background-color: var(--roxo-escuro);
+      color: white;
+      font-weight: 600;
+      padding: 10px 30px;
+      margin-top: 30px;
+    }
+    .form-check-input:checked {
+      background-color: var(--roxo-escuro);
+      border-color: var(--roxo-escuro);
+    }
+  </style>
+</head>
+<body>
+  <div class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="px-3 mb-4">
+        <h2 class="text-center"><i class="bi bi-shield-lock"></i> RegattaID</h2>
+      </div>
+
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'dashboard' %}">
+            <i class="bi bi-speedometer2"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="collapse" href="#usersCollapse" role="button"
+             aria-expanded="false" aria-controls="usersCollapse">
+            <i class="bi bi-people-fill"></i> Usuários
+            <i class="bi bi-chevron-down float-end"></i>
+          </a>
+          <div class="collapse" id="usersCollapse">
+            <ul class="nav flex-column ps-4">
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'listar_estudantes' %}">Estudantes</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'listar_turmas' %}">Turmas</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="{% url 'relatorio' %}">
+            <i class="bi bi-file-earmark-bar-graph-fill"></i> Relatórios
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'horarios' %}">
+            <i class="bi bi-clock-fill"></i> Horários
+          </a>
+        </li>
+      </ul>
+
+      <!-- User Menu -->
+      <div class="user-menu">
+        <div class="px-3 py-2">
+          <h6 class="mb-0"><i class="bi bi-person-circle"></i> {{ request.session.usuario_nome }}</h6>
+          <small class="text-muted">Administrador</small>
+        </div>
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <i class="bi bi-gear"></i> Configurações
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'logout' %}">
+              <i class="bi bi-box-arrow-right"></i> Sair
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="report-container">
+        <h2 class="mb-4"><i class="bi bi-file-earmark-bar-graph-fill"></i> Relatórios</h2>
+        
+        <!-- Filtro por Tipo de Usuário -->
+        <div class="filter-section">
+          <div class="filter-title">
+            <i class="bi bi-funnel"></i> Filtrar por Tipo
+          </div>
+          <div class="filter-options">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="filter-student" data-target="student-search">
+              <label class="form-check-label" for="filter-student">Estudante</label>
+              <div id="student-search" class="mt-2" style="display:none;">
+                <input type="text" class="form-control" placeholder="Digite o nome do estudante">
+              </div>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="filter-class" data-target="class-search">
+              <label class="form-check-label" for="filter-class">Turma</label>
+              <div id="class-search" class="mt-2" style="display:none;">
+                <input type="text" class="form-control" placeholder="Digite o nome da turma">
+              </div>
+            </div>
+            <!-- adicione mais filtros se quiser -->
+          </div>
+        </div>
+        
+        <!-- Filtro por Data -->
+        <div class="filter-section">
+          <div class="filter-title">
+            <i class="bi bi-calendar"></i> Filtrar por Data
+          </div>
+          <div class="date-filters">
+            <div>
+              <label for="start-date" class="form-label">Início</label>
+              <input type="date" class="form-control" id="start-date">
+            </div>
+            <div>
+              <label for="end-date" class="form-label">Término</label>
+              <input type="date" class="form-control" id="end-date">
+            </div>
+          </div>
+        </div>
+        
+        <!-- Formato de Exportação -->
+        <div class="filter-section">
+          <div class="filter-title">
+            <i class="bi bi-download"></i> Formato de Exportação
+          </div>
+          <div class="export-options">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="exportFormat" id="csv" checked>
+              <label class="form-check-label" for="csv">CSV</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="exportFormat" id="excel">
+              <label class="form-check-label" for="excel">Excel</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="exportFormat" id="pdf">
+              <label class="form-check-label" for="pdf">PDF</label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Botão Exportar -->
+        <div class="text-center">
+          <button class="btn export-btn">
+            <i class="bi bi-download"></i> EXPORTAR RELATÓRIO
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Toggle filtros -->
+  <script>
+    document.querySelectorAll('.form-check-input').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const target = document.getElementById(cb.dataset.target);
+        target.style.display = cb.checked ? 'block' : 'none';
+        // desmarca os outros para um filtro por vez
+        if (cb.checked) {
+          document.querySelectorAll('.filter-options .form-check-input').forEach(o => {
+            if (o !== cb) {
+              o.checked = false;
+              document.getElementById(o.dataset.target).style.display = 'none';
+            }
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+
+View atual: já implementada (você pode reusar ou adaptar).
+from django.shortcuts import render, redirect, get_object_or_404
+from ..models import AcessoRegistrado
+from ..forms import TurmaForm
+from .decorator import admin_required
+
+@admin_required
+def relatorio_view(request):
+    # usamos o mesmo nome de variável que o template espera
+    eventos = AcessoRegistrado.objects.order_by('-data_hora')
+    return render(request,
+                  'regatta_id_app/relatorio/relatorio.html',
+                  {'eventos': eventos})
+
+
+forms já implementadas:
+
+from django import forms
+from .usuario import UsuarioForm
+from ..models import Usuario
+
+class VoluntarioForm(UsuarioForm):
+    class Meta(UsuarioForm.Meta):
+        fields = UsuarioForm.Meta.fields + [
+            "rg",
+            "cargo",          # área de atuação
+            "data_admissao",  # data de entrada
+            "validade_fim",   # data de saída opcional
+            "observacoes",
+        ]
+        widgets = {
+            **UsuarioForm.Meta.widgets,
+            "rg":            forms.TextInput(attrs={"class": "form-control"}),
+            "cargo":         forms.TextInput(attrs={"class": "form-control"}),
+            "data_admissao": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+            "validade_fim":  forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+            "observacoes":   forms.Textarea(attrs={"class": "form-control", "rows":3}),
+        }
+
+
+# regatta_id_app/forms/visitante.py
+from django import forms
+from .usuario import UsuarioForm
+from ..models import Usuario
+
+class VisitanteForm(UsuarioForm):
+    class Meta(UsuarioForm.Meta):
+        fields = UsuarioForm.Meta.fields + [
+            "rg",
+            "validade_inicio",
+            "validade_fim",
+            "turno_entrada",
+            "visitado",
+            "observacoes",
+        ]
+        widgets = {
+            **UsuarioForm.Meta.widgets,
+            "rg": forms.TextInput(attrs={"class": "form-control"}),
+            "validade_inicio": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+            "validade_fim":    forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+            "turno_entrada":   forms.Select(attrs={"class": "form-select"}),
+            "visitado":        forms.TextInput(attrs={"class": "form-control"}),
+            "observacoes":     forms.Textarea(attrs={"class": "form-control", "rows":3}),
+        }
+
+
+from django import forms
+from ..models import Usuario
+from .usuario import UsuarioForm
+
+class ColaboradorForm(UsuarioForm):
+    class Meta(UsuarioForm.Meta):
+        # acrescenta os novos campos
+        fields = UsuarioForm.Meta.fields + ["cargo", "data_admissao"]
+        widgets = {
+            **UsuarioForm.Meta.widgets,
+            "cargo": forms.TextInput(attrs={"class": "form-control"}),
+            "data_admissao": forms.DateInput(attrs={"type": "date",
+                                                    "class": "form-control"}),
+        }
+
+
+from django import forms
+from ..models import Horario
+
+DIAS_SEMANA_CHOICES = [
+    ('segunda', 'Segunda-feira'),
+    ('terca', 'Terça-feira'),
+    ('quarta', 'Quarta-feira'),
+    ('quinta', 'Quinta-feira'),
+    ('sexta', 'Sexta-feira'),
+    ('sabado', 'Sábado'),
+    ('domingo', 'Domingo'),
+]
+
+class HorarioForm(forms.ModelForm):
+    dias_semana = forms.MultipleChoiceField(
+        choices=DIAS_SEMANA_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+        label='Dias da Semana',
+        required=True
+    )
+
+    class Meta:
+        model = Horario
+        fields = ['turma', 'hora_entrada', 'hora_saida', 'dias_semana']
+        widgets = {
+            'hora_entrada': forms.TimeInput(attrs={'type': 'time'}),
+            'hora_saida': forms.TimeInput(attrs={'type': 'time'}),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        entrada = cleaned_data.get('hora_entrada')
+        saida = cleaned_data.get('hora_saida')
+
+        if entrada and saida and entrada >= saida:
+            self.add_error('hora_saida', 'A hora de saída deve ser depois da hora de entrada.')
+
+from django import forms
+from django.core.exceptions import ValidationError
+import re
+from ..models import Usuario
+
+class UsuarioForm(forms.ModelForm):
+    class Meta:
+        model = Usuario
+        fields = [
+            'nome',
+            'email',
+            'cpf',
+            'telefone',
+            'foto',
+        ]
+        widgets = {
+            'nome':     forms.TextInput(attrs={'class':'form-control'}),
+            'email':    forms.EmailInput(attrs={'class':'form-control'}),
+            'cpf':      forms.TextInput(attrs={'class':'form-control', 'placeholder':'000.000.000-00'}),
+            'telefone': forms.TextInput(attrs={'class':'form-control', 'placeholder':'(00) 90000-0000'}),
+            'foto':     forms.ClearableFileInput(attrs={'class':'form-control', 'accept':'image/*'}),
+        }
+
+
+    def clean_cpf(self):
+        cpf = self.cleaned_data.get('cpf', '')
+        cpf_num = validar_cpf(cpf)
+
+        # Se estamos editando e o CPF não mudou, permite salvar
+        if self.instance and self.instance.pk:
+            instance_cpf = re.sub(r'\D', '', self.instance.cpf or '')
+            if instance_cpf == cpf_num:
+                return cpf_num
+
+        # Verifica se há outro usuário com o mesmo CPF
+        if Usuario.objects.filter(cpf=cpf_num).exists():
+            raise ValidationError('Este CPF já está cadastrado em outro usuário.')
+
+        return cpf_num
+
+
+    def clean_telefone(self):
+        telefone = self.cleaned_data.get('telefone', '')
+        # remove tudo que não for dígito
+        tel_num = re.sub(r'\D', '', telefone)
+
+        # Telefones brasileiros: DDD (2) + 8 ou 9 dígitos
+        if not re.fullmatch(r'\d{10,11}', tel_num):
+            raise ValidationError('Telefone inválido. Informe DDD + número (10 ou 11 dígitos).')
+
+        return tel_num  # opcional: armazena somente números
+
+def validar_cpf(cpf: str):
+    """
+    Valida um CPF brasileiro:
+    - Deve ter 11 dígitos
+    - Não pode ser sequência de dígitos iguais
+    - Deve validar dígitos verificadores
+    """
+    # Remove tudo que não for dígito
+    cpf_num = re.sub(r'\D', '', cpf)
+
+    if len(cpf_num) != 11:
+        raise ValidationError('CPF deve conter 11 dígitos numéricos.')
+
+    # Rejeita CPFs com todos os dígitos iguais (ex. 111.111.111-11)
+    if cpf_num == cpf_num[0] * 11:
+        raise ValidationError('CPF inválido.')
+
+    # Calcula dígitos verificadores
+    def calc_digito(seq):
+        s = sum(int(a) * b for a, b in zip(seq, range(len(seq)+1, 1, -1)))
+        resto = (s * 10) % 11
+        return '0' if resto == 10 else str(resto)
+
+    dv1 = calc_digito(cpf_num[:9])
+    dv2 = calc_digito(cpf_num[:9] + dv1)
+
+    if cpf_num[-2:] != dv1 + dv2:
+        raise ValidationError('CPF inválido.')
+
+    return cpf_num  # opcional: retorna somente números
+
+from django import forms
+from ..models import Turma
+
+class TurmaForm(forms.ModelForm):
+    class Meta:
+        model = Turma
+        fields = ['nome', 'descricao']
+        widgets = {
+            'nome': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nome da turma'
+            }),
+            'descricao': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Descrição da turma',
+                'rows': 4
+            }),
+        }
+
+partials já implementadas:
+
+<!-- templates/partials/head.html -->
+{% load static %}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RegattaID - Dashboard</title>
+
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+<style>
+    :root {
+        --roxo-escuro: #4b2e83;
+        --roxo-medio: #6a3d9a;
+        --lilas: #b399d4;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8f9fa;
+    }
+
+    .sidebar {
+        background: linear-gradient(to bottom, var(--roxo-escuro), var(--roxo-medio));
+        color: white;
+        height: 100vh;
+        position: fixed;
+        width: 250px;
+        padding-top: 20px;
+        overflow-y: auto;
+        z-index: 1000;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar .nav-link {
+        color: rgba(255, 255, 255, 0.9);
+        padding: 12px 20px;
+        margin: 2px 10px;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+    }
+
+    .sidebar .nav-link:hover {
+        background-color: rgba(255, 255, 255, 0.15);
+        transform: translateX(5px);
+    }
+
+    .sidebar .nav-link.active {
+        background-color: rgba(255, 255, 255, 0.2);
+        font-weight: 500;
+        box-shadow: inset 3px 0 0 var(--lilas);
+    }
+
+    .sidebar .nav-link i {
+        margin-right: 12px;
+        font-size: 1.1rem;
+        width: 20px;
+        text-align: center;
+    }
+
+    .user-menu {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 15px;
+        background-color: rgba(0, 0, 0, 0.1);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .main-content {
+        margin-left: 250px;
+        padding: 30px 50px;
+        max-width: 1200px;
+        margin-right: auto;
+        margin-left: auto;
+    }
+
+    .metric-card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s;
+        height: 100%;
+    }
+
+    .metric-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .metric-card .card-body {
+        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .metric-value {
+        font-size: 3rem;
+        font-weight: bold;
+        margin: 10px 0;
+    }
+
+    .log-entry {
+        border-left: 4px solid var(--roxo-medio);
+        padding: 15px 20px;
+        margin-bottom: 15px;
+        background-color: white;
+        border-radius: 0 5px 5px 0;
+    }
+
+    .dashboard-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .metrics-container {
+        max-width: 900px;
+        margin: 0 auto 40px;
+    }
+
+    .log-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .card-title {
+        font-size: 1.2rem;
+        text-align: center;
+    }
+
+    .log-entry {
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+</style>
+</head>
+<!-- templates/partials/sidebar.html -->
+<div class="sidebar">
+    <div class="px-3 mb-4">
+      <h2 class="text-center"><i class="bi bi-shield-lock"></i> RegattaID</h2>
+    </div>
+  
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link active" href="#">
+          <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="collapse" href="#usersCollapse">
+          <i class="bi bi-people-fill"></i> Usuários <i class="bi bi-chevron-down float-end"></i>
+        </a>
+        <div class="collapse" id="usersCollapse">
+          <ul class="nav flex-column ps-4">
+            <li class="nav-item"><a class="nav-link" href="{% url 'listar_estudantes' %}">Estudantes</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Colaboradores</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Voluntários</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Visitantes</a></li>
+          </ul>
+        </div>
+      </li>
+      <li class="nav-item"><a class="nav-link" href="{% url 'listar_turmas' %}"><i class="bi bi-journal-bookmark-fill"></i> Turmas</a></li>
+      <li class="nav-item"><a class="nav-link" href="{% url 'relatorio' %}"><i class="bi bi-file-earmark-bar-graph-fill"></i> Relatórios</a></li>
+      <li class="nav-item"><a class="nav-link" href="{% url 'horarios' %}"><i class="bi bi-clock-fill"></i> Horários</a></li>
+    </ul>
+  
+    <div class="user-menu">
+      <div class="px-3 py-2">
+        <h6 class="mb-0"><i class="bi bi-person-circle"></i> {{ request.session.usuario_nome }}</h6>
+        <small class="text-muted">{{ request.session.usuario_tipo }}</small>
+      </div>
+      <ul class="nav flex-column">
+        <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-gear"></i> Configurações</a></li>
+        <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-box-arrow-right"></i> Sair</a></li>
+      </ul>
+    </div>
+  </div>
+  <!-- templates/partials/footer.html -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  tooltipTriggerList.map(function (el) {
+    return new bootstrap.Tooltip(el);
+  });
+</script>
+<!-- templates/partials/foto_preview.html -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const fotoInput = document.getElementById('id_foto');
+    const preview   = document.getElementById('photoPreview');
+    if (fotoInput && preview) {
+        fotoInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => preview.innerHTML =
+            `<img src="${ev.target.result}" alt="Preview da foto">`;
+        reader.readAsDataURL(file);
+        });
+    }
+});
+</script>
+<!-- templates/partials/helpees_mascara.html -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // helpers de máscara
+        function maskCPF(v) {
+            v = v.replace(/\D/g, '').slice(0, 11);
+            v = v.replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})\.(\d{3})(\d)/, '$1.$2.$3')
+                .replace(/(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4');
+            return v;
+        }
+        function maskTel(v) {
+            v = v.replace(/\D/g, '').slice(0, 11);
+            if (v.length > 10) v = v.replace(/^(\d{2})(\d{5})(\d+)/, '($1) $2-$3');
+            else v = v.replace(/^(\d{2})(\d{4})(\d+)/, '($1) $2-$3');
+            return v;
+        }
+
+        // CPF
+        const cpfInput = document.getElementById('id_cpf');
+        if (cpfInput) {
+            // aplica já ao valor existente
+            cpfInput.value = maskCPF(cpfInput.value);
+            // reaplica ao editar
+            cpfInput.addEventListener('input', e => {
+                e.target.value = maskCPF(e.target.value);
+            });
+        }
+
+        // Telefone
+        const telInput = document.getElementById('id_telefone');
+        if (telInput) {
+            telInput.value = maskTel(telInput.value);
+            telInput.addEventListener('input', e => {
+                e.target.value = maskTel(e.target.value);
+            });
+        }
+    });
+</script>
+
+Apenas crie ou altere arquivos se realmente necessário para o funcionamento correto da view com dados reais e integração com partials.
