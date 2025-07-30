@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    {% include "partials/head.html" %}
+    <title>RegattaID - Turmas</title>
+</head>
+
+<body>
+  <div class="d-flex">
+    {% include "partials/sidebar.html" %}
+
+    <div class="main-content">
+      <div class="content-container">
+
+        <!-- Cabeçalho / botão -->
+        <div class="page-header">
+          <h1 class="page-title">Turmas</h1>
+          <a href="{% url 'cadastrar_turma' %}" class="btn btn-add">
+            <i class="bi bi-plus-lg"></i> CADASTRAR TURMA
+          </a>
+        </div>
+
+        <!-- Tabela -->
+        <table class="students-table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Horário</th>
+              <th>Data de Início</th>
+              <th>Data de Término</th>
+              <th>Código</th>
+              <th class="text-center">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for info in turmas_info %}
+              <tr>
+                <td>{{ info.turma.nome }}</td>
+                <td>{{ info.horario }}</td>
+                <td>{{ info.data_inicio|date:"d/m/Y"|default:"—" }}</td>
+                <td>{{ info.data_fim|date:"d/m/Y"|default:"—" }}</td>
+                <td>{{ info.codigo }}</td>
+                <td class="text-center">
+                  <!-- Botão Ver Horários -->
+                  <a href="{% url 'listar_horarios' info.turma.id %}"
+                     class="btn btn-action btn-primary" title="Ver Horários">
+                    <i class="bi bi-clock"></i>
+                  </a>
+                  <!-- Botão Editar -->
+                  <a href="{% url 'editar_turma' info.turma.id %}"
+                     class="btn btn-edit btn-action" title="Editar">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  <!-- Botão Excluir -->
+                  <a href="{% url 'excluir_turma' info.turma.id %}"
+                     class="btn btn-delete btn-action" title="Excluir">
+                    <i class="bi bi-trash"></i>
+                  </a>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="6" class="text-center py-4">Nenhuma turma encontrada.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+  </div>
+
+  {% include "partials/footer.html" %}
+</body>
+</html>

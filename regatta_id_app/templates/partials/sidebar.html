@@ -1,0 +1,41 @@
+<!-- templates/partials/sidebar.html -->
+<div class="sidebar">
+    <div class="px-3 mb-4">
+      <h2 class="text-center"><i class="bi bi-shield-lock"></i> RegattaID</h2>
+    </div>
+  
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link active" href="{% url 'dashboard' %}">
+          <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="collapse" href="#usersCollapse">
+          <i class="bi bi-people-fill"></i> Usuários <i class="bi bi-chevron-down float-end"></i>
+        </a>
+        <div class="collapse" id="usersCollapse">
+          <ul class="nav flex-column ps-4">
+            <li class="nav-item"><a class="nav-link" href="{% url 'listar_estudantes' %}">Estudantes</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'listar_colaboradores' %}">Colaboradores</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'listar_voluntarios' %}">Voluntários</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'listar_visitantes' %}">Visitantes</a></li>
+          </ul>
+        </div>
+      </li>
+      <li class="nav-item"><a class="nav-link" href="{% url 'listar_turmas' %}"><i class="bi bi-journal-bookmark-fill"></i> Turmas</a></li>
+      <li class="nav-item"><a class="nav-link" href="{% url 'relatorio' %}"><i class="bi bi-file-earmark-bar-graph-fill"></i> Relatórios</a></li>
+    </ul>
+  
+    <div class="user-menu">
+      <div class="px-3 py-2">
+        <h6 class="mb-0"><i class="bi bi-person-circle"></i> {{ request.session.usuario_nome }}</h6>
+        <small class="text-muted">{{ request.session.usuario_tipo }}</small>
+      </div>
+      <ul class="nav flex-column">
+        <!-- <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-gear"></i> Configurações</a></li> -->
+        <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right"></i> Sair</a></li>
+      </ul>
+    </div>
+  </div>
+  

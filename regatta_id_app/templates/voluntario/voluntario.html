@@ -1,0 +1,86 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    {% include "partials/head.html" %}
+    <title>RegattaID - Voluntários</title>
+</head>
+<body>
+  <div class="d-flex">
+    {% include "partials/sidebar.html" %}
+
+    <div class="main-content">
+      <div class="content-container">
+
+        <!-- Cabeçalho -->
+        <div class="page-header">
+          <h1 class="page-title">Voluntários</h1>
+          <a href="{% url 'cadastrar_voluntario' %}" class="btn btn-add">
+            <i class="bi bi-plus-lg"></i> CADASTRAR VOLUNTÁRIO
+          </a>
+        </div>
+
+        <!-- Filtros -->
+        <!-- <form method="get" class="filters-container mb-3">
+          <div class="input-group search-filter">
+            <input type="text" name="q" value="{{ filtro_nome }}"
+                   placeholder="Buscar por nome" class="form-control">
+            <button class="btn btn-outline-secondary" type="submit">
+              <i class="bi bi-search"></i>
+            </button>
+          </div>
+
+          <div class="input-group date-filter">
+            <input type="date" name="data_admissao" value="{{ filtro_data }}"
+                   class="form-control" placeholder="Data de entrada">
+          </div>
+        </form> -->
+
+        <!-- Tabela -->
+        <table class="students-table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Email</th>
+              <th>CPF</th>
+              <th>Área de atuação</th>
+              <th>Data de entrada</th>
+              <th class="text-center">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for v in voluntarios %}
+              <tr>
+                <td>{{ v.nome }}</td>
+                <td>{{ v.email|default:"—" }}</td>
+                <td>{{ v.cpf }}</td>
+                <td>{{ v.cargo|default:"—" }}</td>
+                <td>{{ v.data_admissao|date:"d/m/Y"|default_if_none:"—" }}</td>
+                <td class="text-center">
+                  <a class="btn btn-edit btn-action"
+                     href="{% url 'editar_voluntario' v.id %}">
+                     <i class="bi bi-pencil"></i>
+                  </a>
+                  <a class="btn btn-delete btn-action"
+                     href="{% url 'excluir_voluntario' v.id %}">
+                     <i class="bi bi-trash"></i>
+                  </a>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="6" class="text-center py-4">
+                  Nenhum voluntário encontrado.
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+  </div>
+
+  {% include "partials/footer.html" %}
+</body>
+</html>

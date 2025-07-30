@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    {% include "partials/head.html" %}
+    <title>RegattaID - Colaboradores</title>
+</head>
+
+<body>
+  <div class="d-flex">
+    {% include 'partials/sidebar.html' %}
+
+    <div class="main-content">
+      <div class="content-container">
+
+        <!-- Cabeçalho ----------------------->
+        <div class="page-header">
+          <h1 class="page-title">Colaboradores</h1>
+          <a href="{% url 'cadastrar_colaborador' %}" class="btn btn-add">
+            <i class="bi bi-plus-lg"></i> CADASTRAR COLABORADOR
+          </a>
+        </div>
+
+        <!-- Filtros ------------------------->
+        <!-- <form method="get" class="filters-container mb-3">
+          <div class="input-group search-filter">
+            <input type="text"  name="q"
+                   value="{{ filtro_nome }}" placeholder="Buscar por nome"
+                   class="form-control">
+            <button class="btn btn-outline-secondary" type="submit">
+              <i class="bi bi-search"></i>
+            </button>
+          </div>
+
+          <div class="input-group date-filter">
+            <input type="date" name="data_admissao"
+                   value="{{ filtro_data }}" class="form-control"
+                   placeholder="Data de admissão">
+          </div>
+        </form> -->
+
+        <!-- Tabela -------------------------->
+        <table class="students-table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Email</th>
+              <th>CPF</th>
+              <th>Cargo</th>
+              <th>Data de admissão</th>
+              <th class="text-center">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in colaboradores %}
+              <tr>
+                <td>{{ c.nome }}</td>
+                <td>{{ c.email }}</td>
+                <td>{{ c.cpf }}</td>
+                {# ↘︎ ajuste conforme a estrutura escolhida #}
+                <td>{{ c.cargo|default_if_none:"—" }}</td>
+                <td>
+                  {{ c.data_admissao|date:"d/m/Y"|default_if_none:"—" }}
+                </td>
+                <td class="text-center">
+                  <a class="btn btn-edit btn-action"
+                     href="{% url 'editar_colaborador' c.id %}">
+                     <i class="bi bi-pencil"></i>
+                  </a>
+                  <a class="btn btn-delete btn-action"
+                     href="{% url 'excluir_colaborador' c.id %}">
+                     <i class="bi bi-trash"></i>
+                  </a>
+                </td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="6" class="text-center py-4">
+                Nenhum colaborador encontrado.
+              </td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+  </div>
+
+  {% include "partials/footer.html" %}
+</body>
+</html>

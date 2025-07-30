@@ -1,0 +1,93 @@
+{% load static widget_tweaks %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  {% include "partials/head.html" %}
+</head>
+<body>
+  <div class="d-flex">
+    {% include "partials/sidebar.html" %}
+
+    <div class="main-content">
+      <div class="form-container">
+        <h2 class="form-title">
+          <i class="bi bi-journal-plus"></i>
+          {% if form.instance.pk %}Editar Turma{% else %}Cadastrar Turma{% endif %}
+        </h2>
+
+        <a href="{% url 'listar_turmas' %}"
+           class="btn btn-voltar mb-3">
+          <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+
+        <form method="post">
+          {% csrf_token %}
+          {{ form.non_field_errors }}
+
+          <div class="mb-3">
+            <label class="form-label"
+                   for="{{ form.nome.id_for_label }}">Nome da Turma</label>
+            {{ form.nome|add_class:"form-control" }}
+            {{ form.nome.errors }}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label"
+                   for="{{ form.codigo.id_for_label }}">Código</label>
+            {{ form.codigo|add_class:"form-control" }}
+            {{ form.codigo.errors }}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label"
+                   for="{{ form.descricao.id_for_label }}">Descrição</label>
+            {{ form.descricao|add_class:"form-control" }}
+            {{ form.descricao.errors }}
+          </div>
+
+          <hr>
+
+          <h4>Horários</h4>
+          {{ formset.management_form }}
+          {{ formset.non_form_errors }}
+          {% for hf in formset.forms %}
+            <div class="border rounded p-3 mb-3">
+              {{ hf.id }}    {# hidden pk #}
+              {{ hf.turma }} {# hidden fk #}
+
+              <div class="row">
+                <div class="col-md-4 mb-3">
+                  <label class="form-label"
+                         for="{{ hf.hora_entrada.id_for_label }}">Início</label>
+                  {{ hf.hora_entrada|add_class:"form-control" }}
+                  {{ hf.hora_entrada.errors }}
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label"
+                         for="{{ hf.hora_saida.id_for_label }}">Término</label>
+                  {{ hf.hora_saida|add_class:"form-control" }}
+                  {{ hf.hora_saida.errors }}
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label class="form-label"
+                         for="{{ hf.dias_semana.id_for_label }}">Dias da Semana</label>
+                  {{ hf.dias_semana }}
+                  {{ hf.dias_semana.errors }}
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+
+          <button type="submit" class="btn btn-submit">
+            <i class="bi bi-save"></i>
+            {% if form.instance.pk %}ATUALIZAR{% else %}CADASTRAR{% endif %}
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  {% include "partials/footer.html" %}
+</body>
+</html>

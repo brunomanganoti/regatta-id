@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    {% include "partials/head.html" %}
+    <title>RegattaID - Visitantes</title>
+</head>
+<body>
+  <div class="d-flex">
+    {% include "partials/sidebar.html" %}
+
+    <div class="main-content">
+      <div class="content-container">
+
+        <!-- Cabeçalho ------------------------------------------------------>
+        <div class="page-header">
+          <h1 class="page-title">Visitantes</h1>
+          <a href="{% url 'cadastrar_visitante' %}" class="btn btn-add">
+            <i class="bi bi-plus-lg"></i> CADASTRAR VISITANTE
+          </a>
+        </div>
+
+        <!-- Filtros -------------------------------------------------------->
+        <!-- <form method="get" class="filters-container mb-3">
+          <div class="input-group search-filter">
+            <input type="text" name="q" value="{{ filtro_nome }}"
+                   placeholder="Buscar por nome" class="form-control">
+            <button class="btn btn-outline-secondary" type="submit">
+              <i class="bi bi-search"></i>
+            </button>
+          </div>
+
+          <div class="input-group date-filter">
+            <input type="date" name="data_admissao"
+                   value="{{ filtro_data }}" class="form-control"
+                   placeholder="Data de admissão">
+          </div>
+        </form> -->
+
+        <!-- Tabela --------------------------------------------------------->
+        <table class="students-table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Horário¹</th>
+              <th>CPF</th>
+              <th>Data de admissão</th>
+              <th class="text-center">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for v in visitantes %}
+              <tr>
+                <td>{{ v.nome }}</td>
+                <td>—</td>  {#¹ preencher quando houver relação com Horário #}
+                <td>{{ v.cpf }}</td>
+                <td>{{ v.data_admissao|date:"d/m/Y"|default_if_none:"—" }}</td>
+                <td class="text-center">
+                  <a class="btn btn-edit btn-action"
+                     href="{% url 'editar_visitante' v.id %}">
+                     <i class="bi bi-pencil"></i>
+                  </a>
+                  <a class="btn btn-delete btn-action"
+                     href="{% url 'excluir_visitante' v.id %}">
+                     <i class="bi bi-trash"></i>
+                  </a>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="5" class="text-center py-4">
+                  Nenhum visitante encontrado.
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <small class="text-muted fst-italic">
+          ¹ Caso um visitante possua horários associados, este campo poderá
+          exibir algo como “09:00 – 12:00”.
+        </small>
+
+      </div>
+    </div>
+  </div>
+
+  {% include "partials/footer.html" %}
+</body>
+</html>

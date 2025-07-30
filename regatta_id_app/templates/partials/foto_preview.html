@@ -1,0 +1,17 @@
+<!-- templates/partials/foto_preview.html -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const fotoInput = document.getElementById('id_foto');
+    const preview   = document.getElementById('photoPreview');
+    if (fotoInput && preview) {
+        fotoInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => preview.innerHTML =
+            `<img src="${ev.target.result}" alt="Preview da foto">`;
+        reader.readAsDataURL(file);
+        });
+    }
+});
+</script>

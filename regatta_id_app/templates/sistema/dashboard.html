@@ -1,0 +1,58 @@
+{# templates/sistema/dashboard.html #}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+  <!-- Cabeçalho da página -->
+  <div class="dashboard-header mb-4">
+    <h2><i class="bi bi-speedometer2 me-2"></i>Dashboard</h2>
+  </div>
+
+  <!-- Métricas -->
+  <div class="metrics-container row mb-5">
+    <div class="col-md-4 mb-3">
+      <div class="metric-card card">
+        <div class="card-body text-center">
+          <h5 class="card-title">Usuários Ativos</h5>
+          <div class="metric-value">{{ usuarios_ativos }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <div class="metric-card card">
+        <div class="card-body text-center">
+          <h5 class="card-title">Visitantes Ativos</h5>
+          <div class="metric-value">{{ visitas_ativas }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <div class="metric-card card">
+        <div class="card-body text-center">
+          <h5 class="card-title">Credenciais Ativas</h5>
+          <div class="metric-value">{{ credenciais_ativas }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Últimos eventos críticos -->
+  <div class="log-container">
+    <h3 class="mb-3"><i class="bi bi-exclamation-triangle me-1"></i>Últimos Eventos Críticos</h3>
+    {% if eventos %}
+      {% for evento in eventos %}
+        <div class="log-entry mb-2">
+          <small class="text-muted">{{ evento.data_evento|date:"d/m/Y H:i:s" }}</small>
+          &nbsp;–&nbsp;
+          {% if evento.usuario %}
+            {{ evento.usuario.nome }}
+          {% else %}
+            <em>Usuário desconhecido</em>
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-center text-muted">Nenhum evento crítico registrado.</p>
+    {% endif %}
+  </div>
+{% endblock %}

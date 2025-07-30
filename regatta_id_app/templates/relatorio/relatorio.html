@@ -1,0 +1,104 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  {# Cabeçalho genérico (meta, bootstrap, icons) #}
+  {% include 'partials/head.html' %}
+  {# Estilos específicos de relatório #}
+  {% include 'partials/report_styles.html' %}
+</head>
+
+<body>
+  <div class="d-flex">
+    {# Sidebar compartilhada #}
+    {% include 'partials/sidebar.html' %}
+
+    <div class="main-content">
+      <div class="report-container">
+        <h2 class="mb-4">
+          <i class="bi bi-file-earmark-bar-graph-fill"></i> Relatórios
+        </h2>
+
+        {# — Filtro por Tipo de Usuário — #}
+        <div class="filter-section">
+          <div class="filter-title">
+            <i class="bi bi-funnel"></i> Filtrar por Tipo
+          </div>
+          <div class="filter-options">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox"
+                     id="filter-student" data-target="student-search">
+              <label class="form-check-label" for="filter-student">Estudante</label>
+              <div id="student-search" class="mt-2" style="display:none;">
+                <input type="text" class="form-control"
+                       placeholder="Digite o nome do estudante">
+              </div>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox"
+                     id="filter-class" data-target="class-search">
+              <label class="form-check-label" for="filter-class">Turma</label>
+              <div id="class-search" class="mt-2" style="display:none;">
+                <input type="text" class="form-control"
+                       placeholder="Digite o nome da turma">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {# — Filtro por Data — #}
+        <div class="filter-section">
+          <div class="filter-title">
+            <i class="bi bi-calendar"></i> Filtrar por Data
+          </div>
+          <div class="date-filters">
+            <div>
+              <label for="start-date" class="form-label">Início</label>
+              <input type="date" class="form-control" id="start-date">
+            </div>
+            <div>
+              <label for="end-date" class="form-label">Término</label>
+              <input type="date" class="form-control" id="end-date">
+            </div>
+          </div>
+        </div>
+
+        {# — Formato de Exportação — #}
+        <div class="filter-section">
+          <div class="filter-title">
+            <i class="bi bi-download"></i> Formato de Exportação
+          </div>
+          <div class="export-options">
+            <div class="form-check">
+              <input class="form-check-input" type="radio"
+                     name="exportFormat" id="csv" checked>
+              <label class="form-check-label" for="csv">CSV</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio"
+                     name="exportFormat" id="excel">
+              <label class="form-check-label" for="excel">Excel</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio"
+                     name="exportFormat" id="pdf">
+              <label class="form-check-label" for="pdf">PDF</label>
+            </div>
+          </div>
+        </div>
+
+        {# — Botão Exportar — #}
+        <div class="text-center">
+          <button class="btn export-btn">
+            <i class="bi bi-download"></i> EXPORTAR RELATÓRIO
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# Scripts genéricos (Bootstrap, tooltips) #}
+  {% include 'partials/footer.html' %}
+</body>
+</html>
